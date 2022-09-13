@@ -113,10 +113,11 @@ public class ResearchModeVideoStream : MonoBehaviour
                 longAbImageMediaTexture = new Texture2D(320, 288, TextureFormat.Alpha8, false);
                 longAbImageMediaMaterial.mainTexture = longAbImageMediaTexture;
             }
+
             depthPreviewPlane.SetActive(false);
             shortAbImagePreviewPlane.SetActive(false);
         }
-        
+
 
         if (LFPreviewPlane != null)
         {
@@ -145,7 +146,7 @@ public class ResearchModeVideoStream : MonoBehaviour
         // Depth sensor should be initialized in only one mode
         if (depthSensorMode == DepthSensorMode.LongThrow) researchMode.InitializeLongDepthSensor();
         else if (depthSensorMode == DepthSensorMode.ShortThrow) researchMode.InitializeDepthSensor();
-        
+
         researchMode.InitializeSpatialCamerasFront();
         researchMode.SetReferenceCoordinateSystem(unityWorldOrigin);
         researchMode.SetPointCloudDepthOffset(0);
@@ -159,11 +160,12 @@ public class ResearchModeVideoStream : MonoBehaviour
     }
 
     bool startRealtimePreview = true;
+
     void LateUpdate()
     {
 #if ENABLE_WINMD_SUPPORT
         // update depth map texture
-        if (depthSensorMode == DepthSensorMode.ShortThrow && startRealtimePreview && 
+        if (depthSensorMode == DepthSensorMode.ShortThrow && startRealtimePreview &&
             depthPreviewPlane != null && researchMode.DepthMapTextureUpdated())
         {
             byte[] frameTexture = researchMode.GetDepthMapTextureBuffer();
@@ -184,7 +186,7 @@ public class ResearchModeVideoStream : MonoBehaviour
         }
 
         // update short-throw AbImage texture
-        if (depthSensorMode == DepthSensorMode.ShortThrow && startRealtimePreview && 
+        if (depthSensorMode == DepthSensorMode.ShortThrow && startRealtimePreview &&
             shortAbImagePreviewPlane != null && researchMode.ShortAbImageTextureUpdated())
         {
             byte[] frameTexture = researchMode.GetShortAbImageTextureBuffer();
@@ -205,7 +207,7 @@ public class ResearchModeVideoStream : MonoBehaviour
         }
 
         // update long depth map texture
-        if (depthSensorMode == DepthSensorMode.LongThrow && startRealtimePreview && 
+        if (depthSensorMode == DepthSensorMode.LongThrow && startRealtimePreview &&
             longDepthPreviewPlane != null && researchMode.LongDepthMapTextureUpdated())
         {
             byte[] frameTexture = researchMode.GetLongDepthMapTextureBuffer();
@@ -266,6 +268,7 @@ public class ResearchModeVideoStream : MonoBehaviour
                 LFMediaTexture.Apply();
             }
         }
+
         // update RF camera texture
         if (startRealtimePreview && RFPreviewPlane != null && researchMode.RFImageUpdated())
         {
@@ -321,12 +324,14 @@ public class ResearchModeVideoStream : MonoBehaviour
 
 
     #region Button Event Functions
+
     public void TogglePreviewEvent()
     {
         startRealtimePreview = !startRealtimePreview;
     }
 
     bool renderPointCloud = true;
+
     public void TogglePointCloudEvent()
     {
         renderPointCloud = !renderPointCloud;
@@ -368,8 +373,10 @@ public class ResearchModeVideoStream : MonoBehaviour
 #if WINDOWS_UWP
         long ts_ft_left, ts_ft_right;
         var LRFImage = researchMode.GetLRFCameraBuffer(out ts_ft_left, out ts_ft_right);
-        Windows.Perception.PerceptionTimestamp ts_left = Windows.Perception.PerceptionTimestampHelper.FromHistoricalTargetTime(DateTime.FromFileTime(ts_ft_left));
-        Windows.Perception.PerceptionTimestamp ts_right = Windows.Perception.PerceptionTimestampHelper.FromHistoricalTargetTime(DateTime.FromFileTime(ts_ft_right));
+        Windows.Perception.PerceptionTimestamp ts_left =
+ Windows.Perception.PerceptionTimestampHelper.FromHistoricalTargetTime(DateTime.FromFileTime(ts_ft_left));
+        Windows.Perception.PerceptionTimestamp ts_right =
+ Windows.Perception.PerceptionTimestampHelper.FromHistoricalTargetTime(DateTime.FromFileTime(ts_ft_right));
 
         long ts_unix_left = ts_left.TargetTime.ToUnixTimeMilliseconds();
         long ts_unix_right = ts_right.TargetTime.ToUnixTimeMilliseconds();
@@ -388,6 +395,7 @@ public class ResearchModeVideoStream : MonoBehaviour
     }
 
     #endregion
+
     private void OnApplicationFocus(bool focus)
     {
         if (!focus) StopSensorsEvent();
@@ -398,7 +406,8 @@ public class ResearchModeVideoStream : MonoBehaviour
     {
         // Get the current time, in order to create a PerceptionTimestamp. 
         Windows.Globalization.Calendar c = new Windows.Globalization.Calendar();
-        Windows.Perception.PerceptionTimestamp ts = Windows.Perception.PerceptionTimestampHelper.FromHistoricalTargetTime(c.GetDateTime());
+        Windows.Perception.PerceptionTimestamp ts =
+ Windows.Perception.PerceptionTimestampHelper.FromHistoricalTargetTime(c.GetDateTime());
         return ts.TargetTime.ToUnixTimeMilliseconds();
         //return ts.SystemRelativeTargetTime.Ticks;
     }

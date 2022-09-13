@@ -1,0 +1,3 @@
+C:/Users/andre/Documents/UnityProjects/HoloLens2-ResearchMode-Unity/cmake-build-debug/CMakeFiles/HoloLens2_ResearchMode_Unity.dir
+C:/Users/andre/Documents/UnityProjects/HoloLens2-ResearchMode-Unity/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/andre/Documents/UnityProjects/HoloLens2-ResearchMode-Unity/cmake-build-debug/CMakeFiles/rebuild_cache.dir

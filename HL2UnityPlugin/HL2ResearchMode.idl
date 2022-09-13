@@ -4,6 +4,9 @@ namespace HL2UnityPlugin
     {
         HL2ResearchMode();
 
+       // Boolean TransformToWorldSpace(Single j, Single i, Single depth, out Single transX, out Single transY, out Single transZ);
+        Single[] GetRigToWorld();
+
         UInt16 GetCenterDepth();
         UInt16[] GetDepthMapBuffer();
         UInt8[] GetDepthMapTextureBuffer();

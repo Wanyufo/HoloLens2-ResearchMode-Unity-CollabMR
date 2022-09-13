@@ -15,12 +15,18 @@
 #include <vector>
 #include<winrt/Windows.Perception.Spatial.h>
 #include<winrt/Windows.Perception.Spatial.Preview.h>
+#include <DirectXMath.h>
 
 namespace winrt::HL2UnityPlugin::implementation
 {
     struct HL2ResearchMode : HL2ResearchModeT<HL2ResearchMode>
     {
         HL2ResearchMode();
+       
+
+       // bool TransformToWorldSpace(float j, float i, float depth, float& transX, float& transY, float& transZ);
+
+        com_array<float> GetRigToWorld();
 
         UINT16 GetCenterDepth();
         int GetDepthBufferSize();
@@ -86,6 +92,7 @@ namespace winrt::HL2UnityPlugin::implementation
         std::mutex mu;
 
     private:
+        DirectX::XMMATRIX m_depthToWorld;
         float* m_pointCloud = nullptr;
         int m_pointcloudLength = 0;
         float* m_longThrowPointCloud = nullptr;

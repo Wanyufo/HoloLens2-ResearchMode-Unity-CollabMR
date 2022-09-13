@@ -22,6 +22,7 @@
   <ItemGroup>
     <None Include="HL2UnityPlugin.def" />
     <None Include="packages.config" />
+    <None Include="cpp.hint" />
   </ItemGroup>
   <ItemGroup>
     <None Include="PropertySheet.props" />

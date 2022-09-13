@@ -2,6 +2,7 @@
 #include "HL2ResearchMode.h"
 #include "HL2ResearchMode.g.cpp"
 
+
 extern "C"
 HMODULE LoadLibraryA(
     LPCSTR lpLibFileName
@@ -21,8 +22,15 @@ using namespace winrt::Windows::Perception::Spatial::Preview;
 
 namespace winrt::HL2UnityPlugin::implementation
 {
+    
+
+   
+
+
     HL2ResearchMode::HL2ResearchMode() 
     {
+       
+
         // Load Research Mode library
         camConsentGiven = CreateEvent(nullptr, true, false, nullptr);
         imuConsentGiven = CreateEvent(nullptr, true, false, nullptr);
@@ -63,6 +71,81 @@ namespace winrt::HL2UnityPlugin::implementation
         m_sensorDescriptors.resize(sensorCount);
         winrt::check_hresult(m_pSensorDevice->GetSensorDescriptors(m_sensorDescriptors.data(), m_sensorDescriptors.size(), &sensorCount));
     }
+
+    /*
+    bool HL2ResearchMode::TransformToWorldSpace(float j, float i, float depth, float& transX, float& transY, float& transZ)
+    {
+       
+        IResearchModeSensorFrame* pDepthSensorFrame = nullptr;
+        ResearchModeSensorResolution resolution;
+        this->m_depthSensor->GetNextBuffer(&pDepthSensorFrame);
+
+        // process sensor frame
+        pDepthSensorFrame->GetResolution(&resolution);
+        this->m_depthResolution = resolution;
+
+        IResearchModeSensorDepthFrame* pDepthFrame = nullptr;
+        winrt::check_hresult(pDepthSensorFrame->QueryInterface(IID_PPV_ARGS(&pDepthFrame)));
+        ResearchModeSensorTimestamp timestamp;
+
+
+        pDepthSensorFrame->GetTimeStamp(&timestamp);
+
+
+        Windows::Perception::Spatial::SpatialLocation transToWorld = nullptr;
+        if (this->m_reconstructShortThrowPointCloud)
+        {
+            auto ts = PerceptionTimestampHelper::FromSystemRelativeTargetTime(HundredsOfNanoseconds(checkAndConvertUnsigned(timestamp.HostTicks)));
+            transToWorld = this->m_locator.TryLocateAtTimestamp(ts, this->m_refFrame);
+            if (transToWorld == nullptr) return false;
+        }
+
+        XMMATRIX depthToWorld = XMMatrixIdentity();
+        if (this->m_reconstructShortThrowPointCloud)
+            depthToWorld = this->m_depthCameraPoseInvMatrix * SpatialLocationToDxMatrix(transToWorld);
+
+        float xy[2] = { 0, 0 };
+        float uv[2] = { j, i };
+        this->m_pDepthCameraSensor->MapImagePointToCameraUnitPlane(uv, xy);
+        auto pointOnUnitPlane = XMFLOAT3(xy[0], xy[1], 1);
+        auto tempPoint = (float)depth / 1000 * XMVector3Normalize(XMLoadFloat3(&pointOnUnitPlane));
+        // apply transformation
+        auto pointInWorld = XMVector3Transform(tempPoint, depthToWorld);
+       com_array<float_t> dummy(3);
+       float x = 0.1f;
+       float y = 0.2f;
+       float z = 0.3f;
+        transX = x;
+        transY = y;
+        transZ = z;
+        
+        return true;
+    }
+    */
+
+    com_array<float> HL2ResearchMode::GetRigToWorld()
+    {
+
+        com_array<float> result = com_array<float>(16);
+
+        XMFLOAT4X4 fView;
+       
+        XMStoreFloat4x4(&fView, m_depthToWorld);
+        
+        for (int i = 0; i < 4; i++)
+        {
+            for (int j = 0; j < 4; j++)
+            {
+                result[i * 4 + j] = fView(i, j);
+            }
+        }
+
+        return result;
+    }
+
+
+
+
 
     void HL2ResearchMode::InitializeDepthSensor() 
     {
@@ -215,8 +298,13 @@ namespace winrt::HL2UnityPlugin::implementation
                 }
 
                 XMMATRIX depthToWorld = XMMatrixIdentity();
-                if (pHL2ResearchMode->m_reconstructShortThrowPointCloud)
+               
+                if (pHL2ResearchMode->m_reconstructShortThrowPointCloud) {
                     depthToWorld = pHL2ResearchMode->m_depthCameraPoseInvMatrix * SpatialLocationToDxMatrix(transToWorld);
+                    // TODO use RAII?
+                   pHL2ResearchMode->m_depthToWorld = depthToWorld;
+                  
+                }
 
                 pHL2ResearchMode->mu.lock();
                 auto roiCenterFloat = XMFLOAT3(pHL2ResearchMode->m_roiCenter[0], pHL2ResearchMode->m_roiCenter[1], pHL2ResearchMode->m_roiCenter[2]);
@@ -1130,6 +1218,8 @@ namespace winrt::HL2UnityPlugin::implementation
 
         return tempBuffer;
     }
+
+   
 
     // Get depth map texture buffer. (For visualization purpose)
     com_array<uint8_t> HL2ResearchMode::GetDepthMapTextureBuffer()
